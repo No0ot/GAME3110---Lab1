@@ -73,7 +73,8 @@ public partial class PartyCharacter
 
 static public class AssignmentPart1
 {
-
+    const int CharacterStatsSignifier = 1;
+    const int EquipmentDataSignifier = 2;
     static public void SavePartyButtonPressed()
     {
         StreamWriter sw = new StreamWriter("Party.txt");
@@ -82,7 +83,8 @@ static public class AssignmentPart1
         {
             DirectoryInfo directory = new DirectoryInfo(@"D:\Programming Projects\GAME3110 - Multiplayer Systems\StreamingDataLab\StreamingDataLab");
 
-            string line = $"{pc.classID}," +
+            string line = CharacterStatsSignifier + ", " +
+                         $"{pc.classID}," +
                          $"{pc.health}," +
                          $"{pc.mana}," +
                          $"{pc.strength}," +
@@ -90,6 +92,12 @@ static public class AssignmentPart1
                          $"{pc.wisdom},";
 
             sw.WriteLine(line);
+            foreach (int equipID in pc.equipment)
+            {
+                string equipInfo = EquipmentDataSignifier + ", " + equipID;
+                sw.WriteLine(equipInfo);
+            }
+
             Debug.Log("PC class id == " + pc.classID);
         }
         sw.Close();
@@ -107,11 +115,19 @@ static public class AssignmentPart1
         {
             string[] csv = line.Split(',');
 
-            PartyCharacter pc = new PartyCharacter(int.Parse(csv[0]), int.Parse(csv[1]), int.Parse(csv[2]), int.Parse(csv[3]), int.Parse(csv[4]), int.Parse(csv[5]));
-            GameContent.partyCharacters.AddLast(pc);
+            int signifier = int.Parse(csv[0]);
+
+            switch (signifier)
+            {
+                case 1:
+                    PartyCharacter pc = new PartyCharacter(int.Parse(csv[1]), int.Parse(csv[2]), int.Parse(csv[3]), int.Parse(csv[4]), int.Parse(csv[5]), int.Parse(csv[6]));
+                    GameContent.partyCharacters.AddLast(pc);
+                    break;
+                case 2:
+                    GameContent.partyCharacters.Last.Value.equipment.AddLast(int.Parse(csv[1]));
+                    break;
+            }
         }
-
-
         GameContent.RefreshUI();
 
     }
